@@ -21,7 +21,7 @@ public class Team {
     //Three-Letter Abbreviation
     private String tla;
 
-    private String badge;
+    private String crest;
 
 }
 
