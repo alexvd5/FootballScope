@@ -118,7 +118,50 @@ public class FootballDataService {
 
             return dto;
         }).toList();
-
     }
+
+    public MatchDto getMatchById(Long id) {
+        Match match = matchRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Match not found with id: " + id));
+
+        return mapToDto(match);
+    }
+
+    private MatchDto mapToDto(Match match) {
+        MatchDto dto = new MatchDto();
+        dto.setId(match.getId());
+        dto.setStatus(match.getStatus());
+        dto.setUtcDate(match.getUtcDate());
+
+        if (match.getHomeTeam() != null) {
+            TeamDto homeTeam = new TeamDto();
+            homeTeam.setId(match.getHomeTeam().getId());
+            homeTeam.setName(match.getHomeTeam().getName());
+            homeTeam.setCrest(match.getHomeTeam().getCrest());
+            dto.setHomeTeam(homeTeam);
+        }
+
+        if (match.getAwayTeam() != null) {
+            TeamDto awayTeam = new TeamDto();
+            awayTeam.setId(match.getAwayTeam().getId());
+            awayTeam.setName(match.getAwayTeam().getName());
+            awayTeam.setCrest(match.getAwayTeam().getCrest());
+            dto.setAwayTeam(awayTeam);
+        }
+
+        if (match.getHomeScore() != null || match.getAwayScore() != null) {
+            FullTimeDto fullTime = new FullTimeDto();
+            fullTime.setHome(match.getHomeScore());
+            fullTime.setAway(match.getAwayScore());
+
+            ScoreDto score = new ScoreDto();
+            score.setFullTime(fullTime);
+
+            dto.setScore(score);
+        }
+
+        return dto;
+    }
+
 
 }
