@@ -1,7 +1,6 @@
 package com.example.footballscope.services;
 
-import com.example.footballscope.dto.MatchDto;
-import com.example.footballscope.dto.MatchResponseDto;
+import com.example.footballscope.dto.*;
 import com.example.footballscope.models.Match;
 import com.example.footballscope.models.Team;
 import com.example.footballscope.repositories.MatchRepository;
@@ -10,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
+
+import java.util.List;
 
 @Service
 public class FootballDataService {
@@ -76,4 +77,48 @@ public class FootballDataService {
             }
         }
     }
+
+    public List<MatchDto> getALlMatches() {
+        return matchRepository.findAll().stream().map(match -> {
+            MatchDto dto = new MatchDto();
+            dto.setId(match.getId());
+            dto.setStatus(match.getStatus());
+            dto.setUtcDate(match.getUtcDate());
+
+            if (match.getHomeTeam() != null) {
+                TeamDto homeTeamDto = new TeamDto();
+
+                homeTeamDto.setId(match.getHomeTeam().getId());
+                homeTeamDto.setName(match.getHomeTeam().getName());
+                homeTeamDto.setCrest(match.getHomeTeam().getCrest());
+
+                dto.setHomeTeam(homeTeamDto);
+            }
+
+            if (match.getAwayTeam() != null) {
+                TeamDto awayTeamDto = new TeamDto();
+
+                awayTeamDto.setId(match.getAwayTeam().getId());
+                awayTeamDto.setName(match.getAwayTeam().getName());
+                awayTeamDto.setCrest(match.getAwayTeam().getCrest());
+
+                dto.setAwayTeam(awayTeamDto);
+            }
+
+            if (match.getHomeScore() != null || match.getAwayScore() != null) {
+                FullTimeDto fullTime = new FullTimeDto();
+                fullTime.setHome(match.getHomeScore());
+                fullTime.setAway(match.getAwayScore());
+
+                ScoreDto score = new ScoreDto();
+                score.setFullTime(fullTime);
+
+                dto.setScore(score);
+            }
+
+            return dto;
+        }).toList();
+
+    }
+
 }
