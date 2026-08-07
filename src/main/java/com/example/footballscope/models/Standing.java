@@ -16,7 +16,7 @@ public class Standing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int possition;
+    private int position;
 
     private int playedMatches;
 
