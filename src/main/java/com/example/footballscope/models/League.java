@@ -20,6 +20,8 @@ public class League {
 
     private String country;
 
+    private String code;
+
     private String logo;
 
     private int season;
