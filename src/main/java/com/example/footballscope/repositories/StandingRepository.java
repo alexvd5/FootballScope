@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface StandingRepository extends JpaRepository<Standing,Long> {
-    List<Standing> findByLeagueInOrderByPositionAsc(Long leagueId);
+    List<Standing> findByLeagueIdOrderByPositionAsc(Long leagueId);
 
     void deleteByLeagueId(Long leagueId);
 }
