@@ -16,4 +16,5 @@ public class MatchDto {
     private TeamDto homeTeam;
     private TeamDto awayTeam;
     private ScoreDto score;
+    private CompetitionDto competition;
 }
