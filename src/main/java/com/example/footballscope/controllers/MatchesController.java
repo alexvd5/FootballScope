@@ -25,10 +25,24 @@ public class MatchesController {
     }
 
     @GetMapping("/{id}")
-    public MatchDto getMatchById(@PathVariable Long id){
+    public MatchDto getMatchById(@PathVariable Long id) {
         return footballDataService.getMatchById(id);
     }
 
+    @GetMapping("/league/{leagueId}")
+    public List<MatchDto> getMatchesByLeague(@PathVariable Long leagueId) {
+        return footballDataService.getMatchesByLeague(leagueId);
+    }
 
+    @GetMapping("/status/{status}")
+    public List<MatchDto> getMatchesByStatus(@PathVariable String status) {
+        return footballDataService.getMatchesByStatus(status);
+    }
 
+    @GetMapping("/league/{leagueId}/status/{status}")
+    public List<MatchDto> getMatchesByLeagueAndStatus(
+            @PathVariable Long leagueId,
+            @PathVariable String status) {
+        return footballDataService.getMatchesByLeagueAndStatus(leagueId, status);
+    }
 }
