@@ -1,8 +1,11 @@
 package com.example.footballscope.services;
 
 import com.example.footballscope.dto.*;
+import com.example.footballscope.mappers.MatchMapper;
+import com.example.footballscope.models.League;
 import com.example.footballscope.models.Match;
 import com.example.footballscope.models.Team;
+import com.example.footballscope.repositories.LeagueRepository;
 import com.example.footballscope.repositories.MatchRepository;
 import com.example.footballscope.repositories.TeamRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +23,14 @@ public class FootballDataService {
 
     private final MatchRepository matchRepository;
     private final TeamRepository teamRepository;
+    private final LeagueRepository leagueRepository;
+    private final MatchMapper matchMapper;
 
-    public FootballDataService(MatchRepository matchRepository, TeamRepository teamRepository) {
+    public FootballDataService(MatchRepository matchRepository, TeamRepository teamRepository, LeagueRepository leagueRepository) {
         this.matchRepository = matchRepository;
         this.teamRepository = teamRepository;
+        this.leagueRepository = leagueRepository;
+        this.matchMapper = new MatchMapper();
     }
 
     public MatchResponseDto getMatchesFromApi() {
@@ -68,6 +75,19 @@ public class FootballDataService {
                 match.setHomeTeam(homeTeam);
                 match.setAwayTeam(awayTeam);
 
+                if (dto.getCompetition() != null) {
+                    Long compId = dto.getCompetition().getId();
+                    League league = leagueRepository.findById(compId)
+                            .orElseGet(() -> {
+                                League newLeague = new League();
+                                newLeague.setId(dto.getCompetition().getId());
+                                newLeague.setName(dto.getCompetition().getName());
+                                newLeague.setCode(dto.getCompetition().getCode());
+                                return leagueRepository.save(newLeague);
+                            });
+                    match.setLeague(league);
+                }
+
                 if (dto.getScore() != null && dto.getScore().getFullTime() != null) {
                     match.setHomeScore(dto.getScore().getFullTime().getHome());
                     match.setAwayScore(dto.getScore().getFullTime().getAway());
@@ -79,89 +99,26 @@ public class FootballDataService {
     }
 
     public List<MatchDto> getAllMatches() {
-        return matchRepository.findAll().stream().map(match -> {
-            MatchDto dto = new MatchDto();
-            dto.setId(match.getId());
-            dto.setStatus(match.getStatus());
-            dto.setUtcDate(match.getUtcDate());
+        return matchMapper.toDtoList(matchRepository.findAll());
+    }
 
-            if (match.getHomeTeam() != null) {
-                TeamDto homeTeamDto = new TeamDto();
+    public List<MatchDto> getMatchesByLeague(Long leagueId) {
+        return matchMapper.toDtoList(matchRepository.findByLeagueId(leagueId));
+    }
 
-                homeTeamDto.setId(match.getHomeTeam().getId());
-                homeTeamDto.setName(match.getHomeTeam().getName());
-                homeTeamDto.setCrest(match.getHomeTeam().getCrest());
+    public List<MatchDto> getMatchesByStatus(String status) {
+        return matchMapper.toDtoList(matchRepository.findByStatus(status));
+    }
 
-                dto.setHomeTeam(homeTeamDto);
-            }
-
-            if (match.getAwayTeam() != null) {
-                TeamDto awayTeamDto = new TeamDto();
-
-                awayTeamDto.setId(match.getAwayTeam().getId());
-                awayTeamDto.setName(match.getAwayTeam().getName());
-                awayTeamDto.setCrest(match.getAwayTeam().getCrest());
-
-                dto.setAwayTeam(awayTeamDto);
-            }
-
-            if (match.getHomeScore() != null || match.getAwayScore() != null) {
-                FullTimeDto fullTime = new FullTimeDto();
-                fullTime.setHome(match.getHomeScore());
-                fullTime.setAway(match.getAwayScore());
-
-                ScoreDto score = new ScoreDto();
-                score.setFullTime(fullTime);
-
-                dto.setScore(score);
-            }
-
-            return dto;
-        }).toList();
+    public List<MatchDto> getMatchesByLeagueAndStatus(Long leagueId, String status) {
+        return matchMapper.toDtoList(matchRepository.findByLeagueIdAndStatus(leagueId, status));
     }
 
     public MatchDto getMatchById(Long id) {
         Match match = matchRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Match not found with id: " + id));
 
-        return mapToDto(match);
+        return matchMapper.toDto(match);
     }
-
-    private MatchDto mapToDto(Match match) {
-        MatchDto dto = new MatchDto();
-        dto.setId(match.getId());
-        dto.setStatus(match.getStatus());
-        dto.setUtcDate(match.getUtcDate());
-
-        if (match.getHomeTeam() != null) {
-            TeamDto homeTeam = new TeamDto();
-            homeTeam.setId(match.getHomeTeam().getId());
-            homeTeam.setName(match.getHomeTeam().getName());
-            homeTeam.setCrest(match.getHomeTeam().getCrest());
-            dto.setHomeTeam(homeTeam);
-        }
-
-        if (match.getAwayTeam() != null) {
-            TeamDto awayTeam = new TeamDto();
-            awayTeam.setId(match.getAwayTeam().getId());
-            awayTeam.setName(match.getAwayTeam().getName());
-            awayTeam.setCrest(match.getAwayTeam().getCrest());
-            dto.setAwayTeam(awayTeam);
-        }
-
-        if (match.getHomeScore() != null || match.getAwayScore() != null) {
-            FullTimeDto fullTime = new FullTimeDto();
-            fullTime.setHome(match.getHomeScore());
-            fullTime.setAway(match.getAwayScore());
-
-            ScoreDto score = new ScoreDto();
-            score.setFullTime(fullTime);
-
-            dto.setScore(score);
-        }
-
-        return dto;
-    }
-
 
 }
