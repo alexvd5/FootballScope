@@ -21,7 +21,7 @@ public class MatchesController {
 
     @GetMapping
     public List<MatchDto> getAllMatches() {
-        return footballDataService.getALlMatches();
+        return footballDataService.getAllMatches();
     }
 
     @GetMapping("/{id}")

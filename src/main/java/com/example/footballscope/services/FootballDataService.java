@@ -78,7 +78,7 @@ public class FootballDataService {
         }
     }
 
-    public List<MatchDto> getALlMatches() {
+    public List<MatchDto> getAllMatches() {
         return matchRepository.findAll().stream().map(match -> {
             MatchDto dto = new MatchDto();
             dto.setId(match.getId());
