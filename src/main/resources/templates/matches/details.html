@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Match Details</title>
+    <link rel="stylesheet" th:href="@{/css/matches.css}" />
+</head>
+<body>
+<div class="box details-box">
+    <h1>Match Details</h1>
+
+    <h2 th:text="${match.homeTeam != null ? match.homeTeam.name : '-'} + ' vs ' + ${match.awayTeam != null ? match.awayTeam.name : '-'}">Match</h2>
+
+    <div class="score"
+         th:text="${match.score != null and match.score.fullTime != null ? match.score.fullTime.home + ' : ' + match.score.fullTime.away : '- : -'}">
+        0 : 0
+    </div>
+
+    <div class="info"><strong>Status:</strong> <span th:text="${match.status}">STATUS</span></div>
+    <div class="info"><strong>Date:</strong> <span th:text="${#temporals.format(match.utcDate, 'dd MMM yyyy HH:mm')}">Date</span></div>
+
+    <a class="btn" th:href="@{/matches}">Back to matches</a>
+</div>
+</body>
+</html>
