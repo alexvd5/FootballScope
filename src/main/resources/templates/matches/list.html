@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Matches</title>
+    <link rel="stylesheet" th:href="@{/css/matches.css}" />
+</head>
+<body>
+
+<div class="box">
+    <h1>Football Matches</h1>
+    <p>Here are the matches from your app.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Home Team</th>
+                <th>Away Team</th>
+                <th>Score</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="match : ${matches}" class="clickable-row" th:attr="data-href=@{/matches/{id}(id=${match.id})}">
+                <td th:text="${match.homeTeam != null ? match.homeTeam.name : '-'}">Home Team</td>
+                <td th:text="${match.awayTeam != null ? match.awayTeam.name : '-'}">Away Team</td>
+                <td th:text="${match.score != null and match.score.fullTime != null ? match.score.fullTime.home + ':' + match.score.fullTime.away : '-'}">Score</td>
+                <td><span class="badge" th:text="${match.status}">Status</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.clickable-row').forEach(function (row) {
+            row.addEventListener('click', function () {
+                const href = row.getAttribute('data-href');
+                if (href) {
+                    window.location.href = href;
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
